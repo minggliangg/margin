@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="margin. — a clean, client-side Markdown viewer. Upload a file or open a URL; nothing leaves your device." />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f4ee" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1c22" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="color-scheme" content="light dark" />
+
+    <title>margin.</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- No-flash theme: applies the saved/system theme on <html> BEFORE first paint. -->
+    <script>
+      (function () {
+        try {
+          var pref = localStorage.getItem('margin-theme') || 'system';
+          var dark =
+            pref === 'dark' ||
+            (pref === 'system' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var el = document.documentElement;
+          el.classList.toggle('dark', dark);
+          el.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
+
+    <!--
+      GitHub Pages has no SPA fallback. On a hard refresh of a deep link, Pages
+      serves /404.html (= a copy of index.html). This remembers the requested
+      URL, bounces to the app base, and main.tsx restores it before boot.
+      A module script so Vite substitutes import.meta.env.BASE_URL for the
+      deploy path; it no-ops on a normal load (pathname === base).
+    -->
+    <script type="module">
+      (function () {
+        var base = import.meta.env.BASE_URL;
+        var l = window.location;
+        var root = base.replace(/\/$/, '');
+        if (l.pathname === base || (root && l.pathname === root)) return;
+        try {
+          sessionStorage.setItem('m:redirect', l.pathname + l.search + l.hash);
+        } catch (e) {}
+        l.replace(l.origin + base);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
