@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import type { HighlighterCore } from 'shiki'
 import { highlighterPromise, SHIKI_THEMES } from '../lib/highlighter'
+import { stripFrontMatter } from '../lib/frontmatter'
 import { MermaidDiagram } from './MermaidDiagram'
 
 interface Props {
@@ -63,6 +64,11 @@ function Anchor({ id }: { id?: string }) {
 export const Markdown = memo(function Markdown({ source, onContentRendered }: Props) {
   const [highlighter, setHighlighter] = useState<HighlighterCore | null>(null)
 
+  // Strip YAML/TOML front matter (Marp, Jekyll, Hugo, …) before rendering: it's
+  // document metadata, and a leading `---` block otherwise renders as a tangle
+  // of horizontal rules + broken paragraphs.
+  const body = useMemo(() => stripFrontMatter(source), [source])
+
   useEffect(() => {
     let alive = true
     highlighterPromise.then((hl) => {
@@ -81,7 +87,7 @@ export const Markdown = memo(function Markdown({ source, onContentRendered }: Pr
   // Notify the parent after the (possibly async) content commits to the DOM.
   useLayoutEffect(() => {
     onContentRendered?.()
-  }, [source, highlighter, onContentRendered])
+  }, [body, highlighter, onContentRendered])
 
   const components = useMemo<Components>(
     () => ({
@@ -161,7 +167,7 @@ export const Markdown = memo(function Markdown({ source, onContentRendered }: Pr
         rehypePlugins={rehypePlugins}
         components={components}
       >
-        {source}
+        {body}
       </ReactMarkdown>
     </div>
   )

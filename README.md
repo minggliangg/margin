@@ -68,6 +68,8 @@ Actions (Settings → Pages → Source = GitHub Actions).
 ## Features
 
 - GitHub-Flavoured Markdown (tables, task lists, strikethrough, autolinks)
+- YAML/TOML front matter (`---`/`+++` blocks from Marp, Jekyll, Hugo, …) is
+  treated as metadata and hidden, not rendered as content
 - Shiki syntax highlighting, dual light/dark theme driven by CSS
 - Mermaid diagrams — responsive, lazy-loaded, errors isolated per block
 - Auto table of contents with scroll-spy (sticky sidebar on desktop, bottom sheet on mobile)
