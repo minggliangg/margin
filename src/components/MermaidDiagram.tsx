@@ -15,6 +15,10 @@ let idCounter = 0
  * - Theme is baked into the SVG at render time, so we re-initialize + re-render
  *   whenever it changes.
  * - Errors are caught per-diagram so one malformed block never blanks the doc.
+ * - `suppressErrorRendering: true` stops mermaid from appending its own
+ *   "Syntax error in text" error-SVG to document.body on a failed parse/draw
+ *   (its cleanup runs after the throw, so the temp node would otherwise leak
+ *   below the React root). We surface our own error UI instead.
  */
 export function MermaidDiagram({ code }: { code: string }) {
   const theme = useContext(MermaidThemeContext)
@@ -34,6 +38,10 @@ export function MermaidDiagram({ code }: { code: string }) {
           startOnLoad: false,
           theme,
           securityLevel: 'strict',
+          // Prevent mermaid from leaving its fallback "Syntax error in text"
+          // SVG stuck to document.body when a diagram fails to parse/draw —
+          // we render our own error block in the `error` branch below instead.
+          suppressErrorRendering: true,
           flowchart: { useMaxWidth: true, htmlLabels: true },
           themeVariables:
             theme === 'dark'

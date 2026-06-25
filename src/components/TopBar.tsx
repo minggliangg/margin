@@ -1,6 +1,6 @@
 import type { ThemePref } from '../lib/theme'
 import { ThemeToggle } from './ThemeToggle'
-import { MenuIcon, UploadIcon } from './icons'
+import { ListIcon, UploadIcon } from './icons'
 
 interface Props {
   docTitle?: string
@@ -33,20 +33,22 @@ export function TopBar({
           margin<span className="text-accent">.</span>
         </button>
         {docTitle && (
-          <span className="hidden truncate font-sans text-sm text-muted md:inline">
-            · {docTitle}
+          <span className="min-w-0 flex-1 truncate font-sans text-sm text-muted">
+            <span className="hidden md:inline">· </span>
+            {docTitle}
           </span>
         )}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${docTitle ? '' : 'ml-auto'}`}>
           {showTocButton && (
             <button
               type="button"
               onClick={onToggleToc}
-              aria-label="Show contents"
+              aria-label="Contents"
+              title="Contents"
               className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition-colors hover:text-fg lg:hidden"
             >
-              <MenuIcon className="h-[18px] w-[18px]" />
+              <ListIcon className="h-[18px] w-[18px]" />
             </button>
           )}
           <ThemeToggle pref={pref} setPref={setPref} />

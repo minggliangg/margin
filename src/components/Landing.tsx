@@ -27,12 +27,12 @@ export function Landing({
         a markdown reader
       </div>
 
-      <h1 className="font-serif text-5xl font-semibold tracking-tight text-fg sm:text-6xl">
+      <h1 className="font-serif text-[2.75rem] font-semibold tracking-tight text-fg sm:text-6xl">
         margin<span className="text-accent">.</span>
       </h1>
 
-      <p className="mt-4 max-w-md font-serif text-lg leading-relaxed text-muted">
-        Drop in a Markdown file and read it beautifully. Clean typography,
+      <p className="mt-4 max-w-md font-serif text-base leading-relaxed text-muted sm:text-lg">
+        Open a Markdown file and read it beautifully. Clean typography,
         diagrams, code, and dark mode — all in your browser. Nothing leaves your
         device.
       </p>
@@ -40,15 +40,17 @@ export function Landing({
       <button
         type="button"
         onClick={onPickFile}
-        className="group mt-10 flex w-full flex-col items-center gap-3 rounded-2xl border border-dashed border-line bg-surface/50 px-6 py-10 text-fg transition-colors hover:border-accent/60 hover:bg-surface"
+        className="group mt-8 flex w-full flex-col items-center gap-2.5 rounded-2xl border border-dashed border-line bg-surface/50 px-6 py-8 text-fg transition-colors hover:border-accent/60 hover:bg-surface sm:mt-10 sm:gap-3 sm:py-10"
       >
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent transition-transform group-hover:scale-105">
           <UploadIcon className="h-6 w-6" />
         </span>
-        <span className="font-sans text-base font-medium">
-          Drop a Markdown file, or click to browse
+        <span className="font-sans text-sm font-medium sm:text-base">
+          Choose a Markdown file
         </span>
-        <span className="font-sans text-xs text-muted">.md · .markdown · .mdown</span>
+        <span className="font-sans text-xs text-muted">
+          or drag &amp; drop · .md · .markdown · .mdown
+        </span>
       </button>
 
       <div className="my-6 flex w-full items-center gap-4">

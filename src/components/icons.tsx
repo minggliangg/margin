@@ -48,6 +48,28 @@ export function MenuIcon(props: IconProps) {
   )
 }
 
+/* A list of bulleted rows — reads as "contents" rather than a generic menu. */
+export function ListIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" />
+      <path d="M9 6h12" />
+      <circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" />
+      <path d="M9 12h12" />
+      <circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
+      <path d="M9 18h12" />
+    </svg>
+  )
+}
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  )
+}
+
 export function UploadIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
