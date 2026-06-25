@@ -45,3 +45,7 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+        env:
+          # deploy-pages@v5 (Node 24) prints a benign `punycode` DEP0040 warning
+          # from one of its own deps; silence it for a clean log.
+          NODE_OPTIONS: --no-deprecation
