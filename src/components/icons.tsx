@@ -103,3 +103,40 @@ export function FileTextIcon(props: IconProps) {
     </svg>
   )
 }
+
+/* A bookmark — reads as "save the current document". */
+export function BookmarkIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
+export function TrashIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+    </svg>
+  )
+}
+
+/* A collection of stacked sheets — reads as a "library" of saved documents. */
+export function LibraryIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3" y="4" width="6" height="16" rx="1" />
+      <rect x="11" y="4" width="4" height="16" rx="1" />
+      <path d="M17.5 5.5l3.2 1 .7 14-3.2-1z" />
+    </svg>
+  )
+}
+
+export function ClipboardIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+    </svg>
+  )
+}

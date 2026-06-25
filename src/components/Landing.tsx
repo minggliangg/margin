@@ -1,12 +1,15 @@
 import { useId } from 'react'
-import { FileTextIcon, LinkIcon, UploadIcon } from './icons'
+import { ClipboardIcon, FileTextIcon, LinkIcon, UploadIcon } from './icons'
 
 interface Props {
   onPickFile: () => void
   onLoadUrl: (url: string) => void
   onLoadSample: () => void
+  onLoadPaste: (text: string) => void
   urlValue: string
   setUrlValue: (v: string) => void
+  pasteValue: string
+  setPasteValue: (v: string) => void
   error: string | null
 }
 
@@ -14,11 +17,15 @@ export function Landing({
   onPickFile,
   onLoadUrl,
   onLoadSample,
+  onLoadPaste,
   urlValue,
   setUrlValue,
+  pasteValue,
+  setPasteValue,
   error,
 }: Props) {
   const urlId = useId()
+  const canRender = pasteValue.trim().length > 0
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-2xl flex-col items-center justify-center px-4 py-16 text-center">
@@ -96,6 +103,41 @@ export function Landing({
           {error}
         </p>
       )}
+
+      <div className="my-6 flex w-full items-center gap-4">
+        <span className="h-px flex-1 bg-line" />
+        <span className="font-sans text-xs uppercase tracking-wider text-muted">
+          or paste markdown
+        </span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (canRender) onLoadPaste(pasteValue)
+        }}
+        className="w-full"
+      >
+        <div className="relative">
+          <ClipboardIcon className="pointer-events-none absolute left-3 top-3 h-[18px] w-[18px] text-muted" />
+          <textarea
+            value={pasteValue}
+            onChange={(e) => setPasteValue(e.target.value)}
+            placeholder={'# Title\n\nPaste raw Markdown here, then render it.'}
+            rows={8}
+            spellCheck={false}
+            className="w-full resize-y rounded-2xl border border-line bg-surface py-3 pl-10 pr-4 font-mono text-sm leading-relaxed text-fg placeholder:text-muted/70 focus:border-accent/60 focus:outline-none"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={!canRender}
+          className="mt-3 h-11 shrink-0 rounded-full bg-accent px-5 font-sans text-sm font-semibold text-canvas transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
+        >
+          Render
+        </button>
+      </form>
 
       <button
         type="button"

@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Landing } from './components/Landing'
 import { Reader } from './components/Reader'
 import { TopBar } from './components/TopBar'
 import { UploadIcon } from './components/icons'
 import { fetchMarkdownText, LoadError } from './lib/fetchMarkdown'
 import { isMarkdownFile, readFileAsText } from './lib/files'
+import { stripFrontMatter } from './lib/frontmatter'
+import { useDocs } from './lib/storage'
 import { useTheme } from './lib/theme'
 
 interface Doc {
@@ -25,6 +27,17 @@ function deriveTitle(url: string): string {
   } catch {
     return 'document'
   }
+}
+
+/**
+ * Title a pasted doc from its first `#`-heading. Front matter is stripped first
+ * so a YAML `---` block (which carries no H1) doesn't shadow the real title;
+ * an ATX heading is then the most reliable Markdown signal of intent.
+ */
+function pasteTitle(source: string): string {
+  const body = stripFrontMatter(source)
+  const m = body.match(/^#{1}\s+(.+?)\s*$/m)
+  return m ? m[1].replace(/[#*`_]/g, '').trim() : 'Pasted document'
 }
 
 function setUrlParam(url: string) {
@@ -55,14 +68,46 @@ function hasFiles(e: DragEvent): boolean {
 
 export function App() {
   const { pref, setPref, isDark } = useTheme()
+  const { docs, saveDoc, removeDoc } = useDocs()
   const [doc, setDoc] = useState<Doc | null>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
   const [urlValue, setUrlValue] = useState('')
+  const [pasteValue, setPasteValue] = useState('')
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const openPicker = useCallback(() => fileInputRef.current?.click(), [])
+
+  const loadPaste = useCallback((text: string) => {
+    const source = text.trim()
+    if (!source) return
+    setDoc({ source, title: pasteTitle(source) })
+    setPasteValue('')
+    clearUrlParam()
+    setStatus('idle')
+    setError(null)
+  }, [])
+
+  // A saved doc is local — it has no URL, so opening one clears any ?url= param.
+  const openSaved = useCallback((saved: { source: string; title: string }) => {
+    setDoc({ source: saved.source, title: saved.title })
+    clearUrlParam()
+    setStatus('idle')
+    setError(null)
+    window.scrollTo(0, 0)
+  }, [])
+
+  const handleSave = useCallback(() => {
+    if (doc) saveDoc({ title: doc.title, source: doc.source })
+  }, [doc, saveDoc])
+
+  // A doc is "saved" when its source already exists in the library. Source is the
+  // full Markdown text, so it's a reliable fingerprint; a delete flips this back.
+  const isSaved = useMemo(
+    () => Boolean(doc && docs.some((d) => d.source === doc.source)),
+    [doc, docs],
+  )
 
   const loadFile = useCallback(async (file: File) => {
     if (!isMarkdownFile(file)) {
@@ -199,6 +244,11 @@ export function App() {
           isDark={isDark}
           onHome={reset}
           onOpen={openPicker}
+          docs={docs}
+          onOpenSaved={openSaved}
+          onDeleteSaved={removeDoc}
+          onSave={handleSave}
+          saved={isSaved}
         />
       ) : (
         <>
@@ -209,6 +259,9 @@ export function App() {
             onHome={reset}
             onOpen={openPicker}
             onToggleToc={() => {}}
+            docs={docs}
+            onOpenSaved={openSaved}
+            onDeleteSaved={removeDoc}
           />
           {loading ? (
             <LoadingView />
@@ -217,8 +270,11 @@ export function App() {
               onPickFile={openPicker}
               onLoadUrl={loadUrl}
               onLoadSample={loadSample}
+              onLoadPaste={loadPaste}
               urlValue={urlValue}
               setUrlValue={setUrlValue}
+              pasteValue={pasteValue}
+              setPasteValue={setPasteValue}
               error={status === 'error' ? error : null}
             />
           )}

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import type { ThemePref } from '../lib/theme'
+import type { SavedDoc } from '../lib/storage'
 import { mermaidTheme, MermaidThemeContext } from '../lib/theme'
 import { useActiveHeading, useTableOfContents } from '../lib/toc'
 import { Markdown } from './Markdown'
@@ -14,6 +15,11 @@ interface Props {
   isDark: boolean
   onHome: () => void
   onOpen: () => void
+  docs: SavedDoc[]
+  onOpenSaved: (doc: SavedDoc) => void
+  onDeleteSaved: (id: string) => void
+  onSave: () => void
+  saved: boolean
 }
 
 export function Reader({
@@ -24,6 +30,11 @@ export function Reader({
   isDark,
   onHome,
   onOpen,
+  docs,
+  onOpenSaved,
+  onDeleteSaved,
+  onSave,
+  saved,
 }: Props) {
   const articleRef = useRef<HTMLElement>(null)
   const [docVersion, setDocVersion] = useState(0)
@@ -44,6 +55,11 @@ export function Reader({
         onHome={onHome}
         onOpen={onOpen}
         onToggleToc={() => setTocOpen(true)}
+        docs={docs}
+        onOpenSaved={onOpenSaved}
+        onDeleteSaved={onDeleteSaved}
+        onSave={onSave}
+        saved={saved}
       />
 
       {/* Mermaid reads the theme from context so a theme toggle re-renders only
