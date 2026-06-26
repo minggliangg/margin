@@ -1,8 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Landing } from './components/Landing'
-import { Reader } from './components/Reader'
 import { TopBar } from './components/TopBar'
 import { UploadIcon } from './components/icons'
+
+// The Reader pulls in the whole render pipeline (react-markdown, remark-gfm,
+// rehype-slug, Shiki, the TOC) — ~167KB gzip that the landing screen never
+// needs. Lazy-loading it keeps the initial bundle to the app shell + Landing,
+// so first paint of the landing screen isn't blocked by the Markdown engine.
+const Reader = lazy(() =>
+  import('./components/Reader').then((m) => ({ default: m.Reader })),
+)
 import { fetchMarkdownText, LoadError } from './lib/fetchMarkdown'
 import { isMarkdownFile, readFileAsText } from './lib/files'
 import { stripFrontMatter } from './lib/frontmatter'
@@ -216,7 +223,7 @@ export function App() {
 
   // Reflect the loaded document in the browser tab title.
   useEffect(() => {
-    document.title = doc ? `${doc.title} · margin.` : 'margin.'
+    document.title = doc ? `${doc.title} · margin.` : 'margin. · a Markdown viewer'
   }, [doc])
 
   const loading = status === 'loading'
@@ -236,20 +243,22 @@ export function App() {
       />
 
       {doc ? (
-        <Reader
-          source={doc.source}
-          title={doc.title}
-          pref={pref}
-          setPref={setPref}
-          isDark={isDark}
-          onHome={reset}
-          onOpen={openPicker}
-          docs={docs}
-          onOpenSaved={openSaved}
-          onDeleteSaved={removeDoc}
-          onSave={handleSave}
-          saved={isSaved}
-        />
+        <Suspense fallback={<LoadingView />}>
+          <Reader
+            source={doc.source}
+            title={doc.title}
+            pref={pref}
+            setPref={setPref}
+            isDark={isDark}
+            onHome={reset}
+            onOpen={openPicker}
+            docs={docs}
+            onOpenSaved={openSaved}
+            onDeleteSaved={removeDoc}
+            onSave={handleSave}
+            saved={isSaved}
+          />
+        </Suspense>
       ) : (
         <>
           <TopBar

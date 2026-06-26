@@ -10,7 +10,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="color-scheme" content="light dark" />
 
-    <title>margin.</title>
+    <title>margin. — a clean, client-side Markdown viewer</title>
+    <meta name="author" content="margin." />
+    <link rel="canonical" href="https://minggliangg.github.io/margin/" />
+
+    <!-- Social / Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="margin. — a clean, client-side Markdown viewer" />
+    <meta
+      property="og:description"
+      content="Open a Markdown file and read it beautifully. Clean typography, diagrams, code, and dark mode — all in your browser. Nothing leaves your device."
+    />
+    <meta property="og:url" content="https://minggliangg.github.io/margin/" />
+    <meta property="og:site_name" content="margin." />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="margin. — a clean, client-side Markdown viewer" />
+    <meta
+      name="twitter:description"
+      content="Open a Markdown file and read it beautifully. Clean typography, diagrams, code, and dark mode — all in your browser. Nothing leaves your device."
+    />
 
     <!-- Favicon (PNG favicons work in all modern browsers; ICO fallback omitted). -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -19,10 +39,30 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Load the web fonts without blocking first paint: preloaded as a fetch, then
+      swapped in as a stylesheet on load. The CSS itself requests display=swap, so
+      text renders immediately in a system fallback and reflows once fonts arrive.
+      <noscript> falls back to a blocking load for no-JS clients (GitHub Pages
+      static hosts and crawlers commonly fetch without running JS).
+    -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
 
     <!-- No-flash theme: applies the saved/system theme on <html> BEFORE first paint. -->
     <script>
