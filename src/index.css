@@ -45,12 +45,15 @@
 }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
-  --font-serif: "Newsreader", "Iowan Old Style", "Apple Garamond", Baskerville,
-    Georgia, "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono",
-    Menlo, Consolas, monospace;
+  /* Family names match the @font-face declarations shipped by
+     @fontsource-variable (imported in main.tsx). The system fallbacks are kept
+     so text renders immediately (font-display: swap) before the woff2 lands. */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-serif: "Newsreader Variable", "Iowan Old Style", "Apple Garamond",
+    Baskerville, Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular,
+    "SF Mono", Menlo, Consolas, monospace;
 }
 
 /* ---- Base ----------------------------------------------------------------- */
