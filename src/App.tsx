@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Footer } from './components/Footer'
 import { Landing } from './components/Landing'
 import { TopBar } from './components/TopBar'
 import { UploadIcon } from './components/icons'
@@ -287,6 +288,9 @@ export function App() {
               error={status === 'error' ? error : null}
             />
           )}
+          {/* The signature lives on the landing screen only; reading a doc
+              fills the viewport and shouldn't carry chrome below the text. */}
+          {!loading && !doc && <Footer />}
         </>
       )}
 
