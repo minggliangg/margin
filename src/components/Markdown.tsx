@@ -7,6 +7,8 @@ import type { HighlighterCore } from 'shiki'
 import { highlighterPromise, SHIKI_THEMES } from '../lib/highlighter'
 import { stripFrontMatter } from '../lib/frontmatter'
 import { MermaidDiagram } from './MermaidDiagram'
+import { CodeFrame } from './CodeFrame'
+import { detectLanguage } from '../lib/detectLang'
 
 interface Props {
   source: string
@@ -100,19 +102,33 @@ export const Markdown = memo(function Markdown({ source, onContentRendered }: Pr
           return <MermaidDiagram code={code.text} />
         }
 
-        // Plain fence, or the highlighter hasn't resolved yet: render raw.
-        if (!highlighter || !code.lang) return <pre {...rest} />
+        // No declared language: guess one so we can label + highlight it.
+        const detected = !code.lang
+        const lang = code.lang ?? detectLanguage(code.text)
+
+        const plain = (
+          <CodeFrame lang={lang} detected={detected} text={code.text}>
+            <pre {...rest} />
+          </CodeFrame>
+        )
+
+        // Highlighter not ready yet, or nothing to highlight with: render raw.
+        if (!highlighter || !lang) return plain
 
         try {
           const html = highlighter.codeToHtml(code.text, {
-            lang: code.lang,
+            lang,
             themes: SHIKI_THEMES,
             defaultColor: false, // drive colour from .dark via CSS vars
           })
-          return <div dangerouslySetInnerHTML={{ __html: html }} />
+          return (
+            <CodeFrame lang={lang} detected={detected} text={code.text}>
+              <div dangerouslySetInnerHTML={{ __html: html }} />
+            </CodeFrame>
+          )
         } catch {
           // Unknown / unloaded language -> fall back to plain monospace code.
-          return <pre {...rest} />
+          return plain
         }
       },
       a({ href, title, children }) {
