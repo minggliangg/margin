@@ -1,14 +1,14 @@
+import type { ReactNode } from 'react'
 import { memo, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import type { HighlighterCore } from 'shiki'
-import { highlighterPromise, SHIKI_THEMES } from '../lib/highlighter'
+import { highlighterPromise } from '../lib/highlighter'
+import { codeFromPre } from '../lib/codeBlock'
 import { stripFrontMatter } from '../lib/frontmatter'
-import { MermaidDiagram } from './MermaidDiagram'
-import { CodeFrame } from './CodeFrame'
-import { detectLanguage } from '../lib/detectLang'
+import { CodeBlock } from './CodeBlock'
 
 interface Props {
   source: string
@@ -16,46 +16,26 @@ interface Props {
   onContentRendered?: () => void
 }
 
-interface CodeBlock {
-  lang: string | null
-  text: string
-}
-
-/**
- * Extract `{ lang, text }` from a <pre><code> HAST node produced by react-markdown.
- * Used to route the block: mermaid -> diagram, known lang -> Shiki, else plain.
- */
-function codeFromPre(node: unknown): CodeBlock | null {
-  if (!node || typeof node !== 'object') return null
-  const pre = node as { type?: string; tagName?: string; children?: unknown[] }
-  if (pre.type !== 'element' || pre.tagName !== 'pre') return null
-  const code = (pre.children ?? []).find(
-    (c) =>
-      typeof c === 'object' &&
-      c !== null &&
-      (c as { tagName?: string }).tagName === 'code',
-  ) as
-    | { properties?: { className?: unknown }; children?: { type?: string; value?: string }[] }
-    | undefined
-  if (!code) return null
-  const cls = code.properties?.className
-  const arr = Array.isArray(cls) ? cls : [cls]
-  const langClass = arr.find(
-    (c): c is string => typeof c === 'string' && c.startsWith('language-'),
-  )
-  const lang = langClass ? langClass.replace('language-', '') : null
-  const text = (code.children ?? [])
-    .map((c) => (c.type === 'text' ? c.value ?? '' : ''))
-    .join('')
-  return { lang, text: text.replace(/\n$/, '') }
-}
-
-function Anchor({ id }: { id?: string }) {
-  if (!id) return null
+/** h2–h4 with a hover-revealed anchor link for sharing a section. */
+function Heading({
+  level,
+  id,
+  children,
+}: {
+  level: 2 | 3 | 4
+  id?: string
+  children?: ReactNode
+}) {
+  const Tag = `h${level}` as const
   return (
-    <a className="anchor" href={`#${id}`} aria-label="Link to this section">
-      #
-    </a>
+    <Tag id={id}>
+      {children}
+      {id && (
+        <a className="anchor" href={`#${id}`} aria-label="Link to this section">
+          #
+        </a>
+      )}
+    </Tag>
   )
 }
 
@@ -96,40 +76,7 @@ export const Markdown = memo(function Markdown({ source, onContentRendered }: Pr
       pre({ node, ...rest }) {
         const code = codeFromPre(node)
         if (!code) return <pre {...rest} />
-
-        // Mermaid: render as a diagram, isolated from the rest of the document.
-        if (code.lang === 'mermaid') {
-          return <MermaidDiagram code={code.text} />
-        }
-
-        // No declared language: guess one so we can label + highlight it.
-        const detected = !code.lang
-        const lang = code.lang ?? detectLanguage(code.text)
-
-        const plain = (
-          <CodeFrame lang={lang} detected={detected} text={code.text}>
-            <pre {...rest} />
-          </CodeFrame>
-        )
-
-        // Highlighter not ready yet, or nothing to highlight with: render raw.
-        if (!highlighter || !lang) return plain
-
-        try {
-          const html = highlighter.codeToHtml(code.text, {
-            lang,
-            themes: SHIKI_THEMES,
-            defaultColor: false, // drive colour from .dark via CSS vars
-          })
-          return (
-            <CodeFrame lang={lang} detected={detected} text={code.text}>
-              <div dangerouslySetInnerHTML={{ __html: html }} />
-            </CodeFrame>
-          )
-        } catch {
-          // Unknown / unloaded language -> fall back to plain monospace code.
-          return plain
-        }
+        return <CodeBlock code={code} highlighter={highlighter} preProps={rest} />
       },
       a({ href, title, children }) {
         return (
@@ -148,30 +95,9 @@ export const Markdown = memo(function Markdown({ source, onContentRendered }: Pr
           </div>
         )
       },
-      h2({ id, children }) {
-        return (
-          <h2 id={id}>
-            {children}
-            <Anchor id={id} />
-          </h2>
-        )
-      },
-      h3({ id, children }) {
-        return (
-          <h3 id={id}>
-            {children}
-            <Anchor id={id} />
-          </h3>
-        )
-      },
-      h4({ id, children }) {
-        return (
-          <h4 id={id}>
-            {children}
-            <Anchor id={id} />
-          </h4>
-        )
-      },
+      h2: (p) => <Heading level={2} {...p} />,
+      h3: (p) => <Heading level={3} {...p} />,
+      h4: (p) => <Heading level={4} {...p} />,
     }),
     [highlighter],
   )

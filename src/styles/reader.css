@@ -1,0 +1,203 @@
+/* ---- Reader typography --------------------------------------------------- */
+/* Hand-rolled (rather than @tailwindcss/typography) for full control over the
+   refined, book-like aesthetic and to keep it in sync with our tokens. */
+
+.reader {
+  font-family: var(--font-serif);
+  color: var(--color-fg);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.reader > :first-child {
+  margin-top: 0;
+}
+
+.reader h1,
+.reader h2,
+.reader h3,
+.reader h4,
+.reader h5,
+.reader h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--color-fg);
+}
+
+.reader h1 {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  line-height: 1.1;
+}
+
+.reader h2 {
+  font-size: clamp(1.5rem, 3vw, 1.75rem);
+  margin: 2.5rem 0 1rem;
+  padding-top: 0.5rem;
+  scroll-margin-top: 6rem;
+}
+
+.reader h3 {
+  font-size: 1.3rem;
+  margin: 2rem 0 0.75rem;
+  scroll-margin-top: 6rem;
+}
+
+.reader h4 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.5rem;
+  scroll-margin-top: 6rem;
+}
+
+.reader h5,
+.reader h6 {
+  font-size: 1rem;
+  margin: 1.25rem 0 0.5rem;
+  scroll-margin-top: 6rem;
+}
+
+.reader p {
+  margin: 0 0 1.25rem;
+}
+
+.reader a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklch, var(--color-accent) 40%, transparent);
+  transition: text-decoration-color 0.15s ease;
+}
+.reader a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.reader strong {
+  font-weight: 600;
+  color: var(--color-fg);
+}
+
+.reader ul,
+.reader ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+.reader li {
+  margin: 0.4rem 0;
+}
+.reader li::marker {
+  color: var(--color-muted);
+}
+
+/* GFM task lists */
+.reader ul:has(> li > input[type="checkbox"]) {
+  list-style: none;
+  padding-left: 0.25rem;
+}
+.reader li:has(> input[type="checkbox"]) {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.reader li > input[type="checkbox"] {
+  margin-top: 0.5em;
+  accent-color: var(--color-accent);
+}
+
+.reader blockquote {
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-muted);
+  font-style: italic;
+}
+.reader blockquote p {
+  margin: 0.5rem 0;
+}
+
+.reader hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--color-line);
+}
+
+/* Inline code */
+.reader code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--color-surface);
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  border: 1px solid var(--color-line);
+  word-break: break-word;
+}
+
+
+/* Tables */
+.reader table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+.reader thead {
+  border-bottom: 1px solid var(--color-line);
+}
+.reader th,
+.reader td {
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+  vertical-align: top;
+}
+.reader th {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+.reader tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.reader img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  border: 1px solid var(--color-line);
+}
+
+/* A heading anchor that fades in on hover, for sharing a section. */
+.reader :is(h2, h3, h4, h5, h6)[id] {
+  position: relative;
+}
+.reader :is(h2, h3, h4, h5, h6)[id] > .anchor {
+  position: absolute;
+  left: -1.25em;
+  color: var(--color-muted);
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.reader :is(h2, h3, h4, h5, h6)[id]:hover > .anchor,
+.reader :is(h2, h3, h4, h5, h6)[id] > .anchor:focus {
+  opacity: 1;
+}
+
+/* Touch devices have no hover: show the anchor inline (dimmed) so it's tappable
+   instead of clipped off the left edge. Deep-linking is also available via the
+   mobile TOC sheet. */
+@media (hover: none) {
+  .reader :is(h2, h3, h4, h5, h6)[id] > .anchor {
+    position: static;
+    margin-left: 0.35em;
+    opacity: 0.4;
+    font-weight: 400;
+  }
+}

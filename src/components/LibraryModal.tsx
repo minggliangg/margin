@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import type { SavedDoc } from '../lib/storage'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 import { CloseIcon, FileTextIcon, TrashIcon } from './icons'
 
 interface Props {
@@ -13,14 +14,6 @@ interface Props {
   // ref callback) so this lazy modal doesn't need to know about the button's
   // lifecycle — the eager Library owns it and hands it down.
   triggerRef: RefObject<HTMLButtonElement | null>
-}
-
-function getFocusable(el: HTMLElement): HTMLElement[] {
-  return Array.from(
-    el.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter((e) => e.offsetParent !== null)
 }
 
 export function LibraryModal({
@@ -36,44 +29,8 @@ export function LibraryModal({
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  // Focus management + Tab trap + body scroll lock while the dialog is open;
-  // restore focus to the trigger button on close. Mirrors the TableOfContents
-  // sheet, which is the established dialog pattern in this app.
-  useEffect(() => {
-    const panel = panelRef.current
-    const focusables = panel ? getFocusable(panel) : []
-    focusables[0]?.focus()
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-        return
-      }
-      if (e.key === 'Tab' && panel) {
-        const f = getFocusable(panel)
-        if (f.length === 0) return
-        const first = f[0]
-        const last = f[f.length - 1]
-        const active = document.activeElement as HTMLElement | null
-        if (e.shiftKey && active === first) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && active === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    }
-
-    document.addEventListener('keydown', onKey)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prevOverflow
-      triggerRef.current?.focus?.()
-    }
-  }, [onClose, triggerRef])
+  // Focus trap, Escape, scroll lock; focus returns to the trigger on close.
+  useDialogFocus({ active: true, panelRef, onClose, returnFocusRef: triggerRef })
 
   return createPortal(
     <div className="fixed inset-0 z-50">

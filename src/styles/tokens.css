@@ -1,0 +1,50 @@
+/* ---- Design tokens -------------------------------------------------------- */
+
+:root {
+  /* Light — warm paper */
+  --color-canvas: oklch(0.975 0.008 75);
+  --color-fg: oklch(0.27 0.015 60);
+  --color-muted: oklch(0.50 0.012 60);
+  --color-surface: oklch(0.945 0.006 75);
+  --color-line: oklch(0.90 0.008 75);
+  --color-accent: oklch(0.50 0.13 255);
+  --color-accent-soft: oklch(0.93 0.03 255);
+}
+
+.dark {
+  /* Dark — soft charcoal, never harsh pure black.
+     muted/accent L are tuned to clear WCAG AA (4.5:1) on canvas & surface:
+     Lighthouse flags the defaults otherwise. */
+  --color-canvas: oklch(0.205 0.006 260);
+  --color-fg: oklch(0.93 0.006 80);
+  --color-muted: oklch(0.78 0.012 80);
+  --color-surface: oklch(0.245 0.007 260);
+  --color-line: oklch(0.32 0.009 260);
+  --color-accent: oklch(0.76 0.11 250);
+  --color-accent-soft: oklch(0.30 0.04 260);
+}
+
+/* Map the runtime tokens to Tailwind utilities (bg-canvas, text-fg, ...).
+   `inline` makes the utilities reference the vars at runtime so they flip
+   with the .dark class. */
+@theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-fg: var(--color-fg);
+  --color-muted: var(--color-muted);
+  --color-surface: var(--color-surface);
+  --color-line: var(--color-line);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
+}
+
+@theme {
+  /* Family names match the @font-face declarations shipped by
+     @fontsource-variable (imported in main.tsx). The system fallbacks are kept
+     so text renders immediately (font-display: swap) before the woff2 lands. */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-serif: "Newsreader Variable", "Iowan Old Style", "Apple Garamond",
+    Baskerville, Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular,
+    "SF Mono", Menlo, Consolas, monospace;
+}

@@ -6,6 +6,10 @@ export function isMarkdownFile(file: File): boolean {
   return file.type === 'text/markdown' || file.type === 'text/x-markdown'
 }
 
+export function stripMarkdownExt(name: string): string {
+  return name.replace(MD_EXT, '')
+}
+
 export async function readFileAsText(file: File): Promise<string> {
   return await file.text()
 }

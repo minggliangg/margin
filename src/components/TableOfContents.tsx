@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { TocItem } from '../lib/toc'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 import { CloseIcon } from './icons'
 
 interface Props {
@@ -7,14 +8,6 @@ interface Props {
   activeId: string | null
   open: boolean
   onClose: () => void
-}
-
-function getFocusable(el: HTMLElement): HTMLElement[] {
-  return Array.from(
-    el.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter((e) => e.offsetParent !== null)
 }
 
 function TocList({
@@ -60,48 +53,7 @@ function TocList({
 
 export function TableOfContents({ items, activeId, open, onClose }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLElement | null>(null)
-
-  // Focus management + Tab trap + body scroll lock while the mobile sheet is
-  // open; restore focus to the trigger button on close.
-  useEffect(() => {
-    if (!open) return
-
-    triggerRef.current = document.activeElement as HTMLElement | null
-    const panel = panelRef.current
-    const focusables = panel ? getFocusable(panel) : []
-    focusables[0]?.focus()
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-        return
-      }
-      if (e.key === 'Tab' && panel) {
-        const f = getFocusable(panel)
-        if (f.length === 0) return
-        const first = f[0]
-        const last = f[f.length - 1]
-        const active = document.activeElement as HTMLElement | null
-        if (e.shiftKey && active === first) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && active === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    }
-
-    document.addEventListener('keydown', onKey)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prevOverflow
-      triggerRef.current?.focus?.()
-    }
-  }, [open, onClose])
+  useDialogFocus({ active: open, panelRef, onClose })
 
   if (!items.length) return null
 
