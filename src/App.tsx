@@ -4,7 +4,9 @@ import { Footer } from './components/Footer'
 import { Landing } from './components/Landing'
 import { LoadingView } from './components/LoadingView'
 import { TopBar } from './components/TopBar'
+import { UpdateBanner } from './components/UpdateBanner'
 import { useDocument } from './hooks/useDocument'
+import { useAutoUpdateCheck } from './hooks/useAutoUpdateCheck'
 import { useFileDrop } from './hooks/useFileDrop'
 import { useDocs } from './lib/storage'
 import { useTheme } from './lib/theme'
@@ -18,8 +20,9 @@ const Reader = lazy(() =>
 )
 
 export function App() {
+  useAutoUpdateCheck()
   const { pref, setPref, isDark } = useTheme()
-  const { docs, saveDoc, removeDoc } = useDocs()
+  const { docs, saveDoc, removeDoc, importDocs } = useDocs()
   const {
     doc,
     status,
@@ -80,6 +83,7 @@ export function App() {
             docs={docs}
             onOpenSaved={openSaved}
             onDeleteSaved={removeDoc}
+            onImportSaved={importDocs}
             onSave={handleSave}
             saved={isSaved}
           />
@@ -96,6 +100,7 @@ export function App() {
             docs={docs}
             onOpenSaved={openSaved}
             onDeleteSaved={removeDoc}
+            onImportSaved={importDocs}
           />
           {loading ? (
             <LoadingView />
@@ -121,6 +126,7 @@ export function App() {
       )}
 
       {dragging && <DropOverlay />}
+      <UpdateBanner />
     </div>
   )
 }

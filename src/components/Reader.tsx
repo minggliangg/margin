@@ -18,6 +18,7 @@ interface Props {
   docs: SavedDoc[]
   onOpenSaved: (doc: SavedDoc) => void
   onDeleteSaved: (id: string) => void
+  onImportSaved: (docs: SavedDoc[]) => number
   onSave: () => void
   saved: boolean
 }
@@ -33,6 +34,7 @@ export function Reader({
   docs,
   onOpenSaved,
   onDeleteSaved,
+  onImportSaved,
   onSave,
   saved,
 }: Props) {
@@ -58,6 +60,7 @@ export function Reader({
         docs={docs}
         onOpenSaved={onOpenSaved}
         onDeleteSaved={onDeleteSaved}
+        onImportSaved={onImportSaved}
         onSave={onSave}
         saved={saved}
       />

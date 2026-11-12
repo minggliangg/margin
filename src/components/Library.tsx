@@ -6,6 +6,7 @@ interface Props {
   docs: SavedDoc[]
   onOpen: (doc: SavedDoc) => void
   onDelete: (id: string) => void
+  onImport: (docs: SavedDoc[]) => number
 }
 
 // The modal body uses createPortal + a focus trap + a scroll lock — none of
@@ -16,7 +17,7 @@ const LibraryModal = lazy(() =>
   import('./LibraryModal').then((m) => ({ default: m.LibraryModal })),
 )
 
-export function Library({ docs, onOpen, onDelete }: Props) {
+export function Library({ docs, onOpen, onDelete, onImport }: Props) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const titleId = useId()
@@ -46,6 +47,7 @@ export function Library({ docs, onOpen, onDelete }: Props) {
               setOpen(false)
             }}
             onDelete={onDelete}
+            onImport={onImport}
             triggerRef={triggerRef}
           />
         </Suspense>

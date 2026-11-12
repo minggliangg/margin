@@ -14,6 +14,17 @@ export interface SavedDoc {
 
 const KEY = 'margin-docs'
 
+export function isSavedDoc(d: unknown): d is SavedDoc {
+  if (typeof d !== 'object' || d === null) return false
+  const o = d as Record<string, unknown>
+  return (
+    typeof o.id === 'string' &&
+    typeof o.title === 'string' &&
+    typeof o.source === 'string' &&
+    typeof o.createdAt === 'number'
+  )
+}
+
 /** Cheap, collision-resistant id without pulling in a uuid dependency. */
 function uid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
@@ -31,16 +42,7 @@ function readAll(): SavedDoc[] {
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    return parsed.filter((d): d is SavedDoc => {
-      if (typeof d !== 'object' || d === null) return false
-      const o = d as Record<string, unknown>
-      return (
-        typeof o.id === 'string' &&
-        typeof o.title === 'string' &&
-        typeof o.source === 'string' &&
-        typeof o.createdAt === 'number'
-      )
-    })
+    return parsed.filter(isSavedDoc)
   } catch {
     /* localStorage may be unavailable (private mode) — treat as empty. */
     return []
@@ -86,5 +88,19 @@ export function useDocs() {
     setDocs((prev) => prev.filter((d) => d.id !== id))
   }, [])
 
-  return { docs, saveDoc, removeDoc }
+  /** Merge restored docs in, skipping any whose id or content is already here. */
+  const importDocs = useCallback(
+    (incoming: SavedDoc[]): number => {
+      const ids = new Set(docs.map((d) => d.id))
+      const sources = new Set(docs.map((d) => d.source))
+      const fresh = incoming.filter((d) => !ids.has(d.id) && !sources.has(d.source))
+      if (fresh.length) {
+        setDocs([...docs, ...fresh].sort((a, b) => b.createdAt - a.createdAt))
+      }
+      return fresh.length
+    },
+    [docs],
+  )
+
+  return { docs, saveDoc, removeDoc, importDocs }
 }

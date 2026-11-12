@@ -15,6 +15,7 @@ interface Props {
   docs: SavedDoc[]
   onOpenSaved: (doc: SavedDoc) => void
   onDeleteSaved: (id: string) => void
+  onImportSaved: (docs: SavedDoc[]) => number
   onSave?: () => void
   saved?: boolean
 }
@@ -30,6 +31,7 @@ export function TopBar({
   docs,
   onOpenSaved,
   onDeleteSaved,
+  onImportSaved,
   onSave,
   saved,
 }: Props) {
@@ -67,7 +69,7 @@ export function TopBar({
             </button>
           )}
           <ThemeToggle pref={pref} setPref={setPref} />
-          <Library docs={docs} onOpen={onOpenSaved} onDelete={onDeleteSaved} />
+          <Library docs={docs} onOpen={onOpenSaved} onDelete={onDeleteSaved} onImport={onImportSaved} />
           {onSave && (
             <button
               type="button"

@@ -1,6 +1,7 @@
 import { useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import type { SavedDoc } from '../lib/storage'
+import { LibraryTools } from './LibraryTools'
 import { useDialogFocus } from '../hooks/useDialogFocus'
 import { CloseIcon, FileTextIcon, TrashIcon } from './icons'
 
@@ -10,6 +11,7 @@ interface Props {
   onClose: () => void
   onOpen: (doc: SavedDoc) => void
   onDelete: (id: string) => void
+  onImport: (docs: SavedDoc[]) => number
   // Focus is restored to the trigger button on close. RefObject (not a plain
   // ref callback) so this lazy modal doesn't need to know about the button's
   // lifecycle — the eager Library owns it and hands it down.
@@ -22,6 +24,7 @@ export function LibraryModal({
   onClose,
   onOpen,
   onDelete,
+  onImport,
   triggerRef,
 }: Props) {
   // Two-step delete: first click arms a row, second click confirms. Avoids a
@@ -127,6 +130,7 @@ export function LibraryModal({
               })}
             </ul>
           )}
+          <LibraryTools docs={docs} onImport={onImport} />
         </div>
       </div>
     </div>,
